@@ -1,0 +1,31 @@
+{
+  "name": "safrochain-faucet-bot",
+  "version": "1.0.0",
+  "description": "Safrochain Faucet bot by 0xNyilzz",
+  "main": "faucet-bot.js",
+  "scripts": {
+    "start": "node faucet-bot.js",
+    "dev": "node faucet-bot.js --verbose",
+    "test": "node -e \"console.log('Testing dependencies...')\"",
+    "generate:wallet": "node scripts/generate-wallet.js",
+    "check:balance": "node scripts/check-balance.js"
+  },
+  "keywords": ["safrochain", "cosmos", "faucet", "bot", "proxy", "testnet"],
+  "author": "0xNyilzz",
+  "license": "MIT",
+  "dependencies": {
+    "@cosmjs/proto-signing": "^0.32.0",
+    "@cosmjs/stargate": "^0.32.0",
+    "@cosmjs/encoding": "^0.32.0",
+    "@cosmjs/crypto": "^0.32.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
