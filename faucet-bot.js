@@ -147,49 +147,57 @@ function getRandomProxy() {
   return CONFIG.PROXIES[Math.floor(Math.random() * CONFIG.PROXIES.length)];
 }
 
-// Support both HTTP and HTTPS proxies - with IP resolution
+// FIXED : Sequence
 async function claimFaucet(address) {
-  try {
-    const proxy = getRandomProxy();
-    let curlCommand = `curl -X POST ${CONFIG.FAUCET_URL} -H "Content-Type: application/json" -d '{"receiver":"${address}"}'`;
+  const MAX_RETRIES = 3;
+  let delay = 30000, attempt = 0;
 
-    if (proxy) {
-      // Support both http:// and https:// proxies
-      curlCommand = `curl -x ${proxy} -X POST ${CONFIG.FAUCET_URL} -H "Content-Type: application/json" -d '{"receiver":"${address}"}'`;
-    }
+  while (attempt < MAX_RETRIES) {
+    try {
+      // --- Faucet Claim ---
+      let curlCommand = `curl -X POST ${CONFIG.FAUCET_URL} -H "Content-Type: application/json" -d '{"receiver":"${address}"}'`;
 
-    console.log(`📡 Claiming faucet untuk ${address}...`);
-    if (proxy) {
-      // Resolve and display proxy IP
-      const proxyIp = await resolveProxyIp(proxy);
-      console.log(`🔄 Menggunakan proxy: ${proxyIp}`);
-    }
-
-    const { stdout, stderr } = await execAsync(curlCommand, {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000
-    });
-
-    if (stderr && !stderr.includes('%')) { // Filter out curl progress bar
-      console.warn('⚠️ Curl warning:', stderr);
-    }
-
-    const response = JSON.parse(stdout);
-
-    if (response.success || response.transactionHash) {
-      console.log(`✅ Faucet claimed successfully!`);
-      if (response.transactionHash) {
-        console.log(`📦 Tx Hash: ${response.transactionHash}`);
+      if (CONFIG.PROXIES.length) {
+        const proxy = getRandomProxy();
+        curlCommand = `curl -x ${proxy} -X POST ${CONFIG.FAUCET_URL} -H "Content-Type: application/json" -d '{"receiver":"${address}"}'`;
+        const proxyIp = await resolveProxyIp(proxy);
+        console.log(`🔄 Menggunakan proxy: ${proxyIp}`);
       }
-      return true;
-    } else {
-      console.log(`⚠️ Faucet claim response:`, response);
-      return false;
+
+      console.log(`📡 Claiming faucet untuk ${address} (attempt ${attempt + 1})...`);
+      const { stdout, stderr } = await execAsync(curlCommand, { maxBuffer: 10 * 1024 * 1024, timeout: 30000 });
+
+      if (stderr && !stderr.includes('%')) console.warn('⚠️ Curl warning:', stderr);
+
+      const response = JSON.parse(stdout);
+
+      if (response.success || response.transactionHash) {
+        console.log(`✅ Faucet claimed successfully!`);
+        return true;
+      } else if ((response.error || '').includes('account sequence mismatch') || (response.error || '').includes('mismatch')) {
+        attempt++;
+        console.log(`❌ Sequence mismatch. Waiting ${delay / 1000}s then retrying (attempt ${attempt + 1})...`);
+        await new Promise(r => setTimeout(r, delay));
+        delay *= 2;
+        continue;
+      } else {
+        console.log(`⚠️ Faucet claim response:`, response);
+        return false;
+      }
+    } catch (error) {
+      if ((error.message || '').includes('sequence') || (error.message || '').includes('mismatch')) {
+        attempt++;
+        console.log(`❌ Sequence mismatch. Waiting ${delay / 1000}s then retrying (attempt ${attempt + 1})...`);
+        await new Promise(r => setTimeout(r, delay));
+        delay *= 2;
+      } else {
+        console.error(`❌ Error claiming faucet:`, error.message);
+        return false;
+      }
     }
-  } catch (error) {
-    console.error(`❌ Error claiming faucet:`, error.message);
-    return false;
   }
+  console.error("❌ Faucet claim ultimately failed after retries.");
+  return false;
 }
 
 // FIXED: Retry logic with sequence mismatch handling
