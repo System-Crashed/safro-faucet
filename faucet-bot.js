@@ -149,8 +149,8 @@ function getRandomProxy() {
 
 // FIXED : Sequence
 async function claimFaucet(address) {
-  const MAX_RETRIES = 3;
-  let delay = 30000, attempt = 0;
+  const MAX_RETRIES = 10;
+  let delay = 3000, attempt = 0;
 
   while (attempt < MAX_RETRIES) {
     try {
@@ -346,8 +346,6 @@ async function init() {
     }
 
     console.log(`\n⚙️ Configuration:`);
-    console.log(`  • Faucet: ${CONFIG.FAUCET_URL}`);
-    console.log(`  • Chain: ${CONFIG.CHAIN_ID}`);
     console.log(`  • Workers: ${CONFIG.WORKERS}`);
     console.log(`  • Proxies: ${CONFIG.PROXIES.length} configured`);
     console.log(`  • Target: ${CONFIG.TARGET_ADDRESS}`);
