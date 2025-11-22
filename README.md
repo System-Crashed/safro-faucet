@@ -1,89 +1,74 @@
-# 🚀 SAFROCHAIN FAUCET BOT v1.0
+# 🚀 SAFROCHAIN FAUCET BOT BY 0xNyilzz
 
-Multi-Wallet Cosmos Address Generator dengan HTTPS Proxy Rotation, Auto-Faucet Claim, dan Auto-Transfer
+Multi-Wallet Cosmos Address Generator dengan Proxy Rotation, Auto-Faucet Claim, dan Auto-Transfer
 
 ## 📌 Overview
 
 Bot ini dirancang untuk mengautomasi proses testing di Safrochain testnet dengan fitur:
 
 - ✅ Generate Multiple Wallets
-- ✅ Proxy HTTPS Rotation
+- ✅ Proxy Rotation
 - ✅ Auto Faucet Claim
-- ✅ Auto Transfer
-- ✅ Data Persistence
-- ✅ Error Handling
-- ✅ Logging
-
-## 🚀 Quick Start
-
-### 1. Install Dependencies
-\`\`\`bash
-npm install
-\`\`\`
-
-### 2. Configure
-\`\`\`bash
-cp config.example.js config.js
-nano config.js
-\`\`\`
-
-### 3. Run Bot
-\`\`\`bash
-npm start
-\`\`\`
+- ✅ Auto Transfer To Destination Address
 
 ## 📋 Configuration
 
-Edit \`config.js\` dan update:
+1. **PROXY HTTP (WAJIB!)**
+- Buat file **proxy.txt**
+```javascript
+  http://user:password@proxy1.example.com:8080
+  http://user:password@proxy2.example.com:8080
+```
 
-1. **PROXY HTTPS** (WAJIB!)
-\`\`\`javascript
-PROXY.URLS: [
-  'https://user:password@proxy1.example.com:8080',
-  'https://user:password@proxy2.example.com:8080',
-]
-\`\`\`
+2. **CONFIGURE**
+```bash
+nano faucet-bot.js
+```
 
-2. **TARGET ADDRESS** (untuk auto-transfer)
-\`\`\`javascript
-TRANSFER.TARGET_ADDRESS: 'addr_safro1xxxxxx'
-TRANSFER.AMOUNT: '1000000'
-\`\`\`
+3. **TARGET ADDRESS** (untuk auto-transfer)
+```javascript
+TRANSFER.TARGET_ADDRESS: 'addr_safroxxxxxxx'
+TRANSFER.AMOUNT: '1000000' // Untuk 1 SAF (konversi 1jt usaf)
+```
 
-3. **WORKERS** (jumlah wallet)
-\`\`\`javascript
-WORKER.COUNT: 3
-\`\`\`
+4. **WORKERS** (jumlah wallet)
+```javascript
+WORKER.COUNT: xxxx // Jumlah worker yg diinginkan
+```
+
+## 🚀 Start
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Run Bot
+```bash
+npm start
+```
+
 
 ## 📁 Output Files
 
-\`\`\`
+```
 wallets/
-├── phrase.txt       # Mnemonik (address|mnemonic)
+├── phrase.txt      # Mnemonik (address|mnemonic)
 └── pk.txt          # Public key (address|pubkey)
-\`\`\`
+```
 
 ## 🔐 Security
 
 ```bash
 # Backup wallets
 cp -r wallets/ wallets_backup_$(date +%Y%m%d)
-
-# Don't commit sensitive files
-git check-ignore -v wallets/
-git check-ignore -v config.js
 ```
 
 ## 📞 Support
 
 - **Docs**: https://docs.safrochain.com
-- **Faucet**: https://faucet.testnet.safrochain.com
 - **Explorer**: https://explorer.testnet.safrochain.com
 
 ## 📝 License
 
 MIT License
-
----
-
-**Made for Safrochain Community** ❤️
